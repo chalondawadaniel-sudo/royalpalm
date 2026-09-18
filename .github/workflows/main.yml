@@ -1,0 +1,36 @@
+name: Fabrication APK Royal Palm
+
+on:
+  push:
+    branches: [ "main", "principal" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Recuperation du code
+      uses: actions/checkout@v4
+
+    - name: Configuration de Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Installation des outils de fabrication Android
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git zip unzip openjdk-17-jdk minizip libffi-dev libssl-dev autoconf automake libtool pkg-config zlib1g-dev libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good
+        pip install --upgrade pip
+        pip install buildozer cython Kivy tinydb
+
+    - name: Fabrication de l'APK avec Buildozer
+      run: |
+        yes | buildozer -v android debug
+
+    - name: Telechargement de l'APK final
+      uses: actions/upload-artifact@v4
+      with:
+        name: Application-Royal-Palm-APK
+        path: bin/*.apk
